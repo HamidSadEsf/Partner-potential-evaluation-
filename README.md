@@ -1,7 +1,7 @@
 # Partner Potential Evaluation: Multi-Agent Due Diligence
 
 ## 🎯 Project Vision
-**Antigravity – Partner Potential Evaluation** is a strategic case study demonstrating a multi‑agent system designed to automate B2B financial due diligence. By orchestrating specialized agents through a deterministic pipeline, the system transforms raw regulatory data into actionable executive briefings, ensuring compliance while accelerating partner onboarding cycles.
+**Partner Potential Evaluation** is a strategic case study demonstrating a multi‑agent system designed to automate B2B financial due diligence. By orchestrating specialized agents through a deterministic pipeline, the system transforms raw regulatory data into actionable executive briefings, ensuring compliance while accelerating partner onboarding cycles.
 
 ---
 
@@ -38,7 +38,7 @@ The system architecture enforces a clean separation between probabilistic LLM re
 > **What to observe in the demo:** Watch the multi‑agent orchestration in real‑time. Notice how the **Research**, **Scoring**, and **Synthesis** agents cooperate. The dashboard surfaces a structured **Reasoning Trace** for every decision, culminating in a high‑fidelity **Executive Briefing** with automated risk metrics.
 
 ![System Demo](./assets/demo_recording.webp)
-*The Antigravity Intelligence Dashboard: Orchestrating complex B2B due‑diligence with glassmorphic design and real‑time agent state tracking.*
+*The partner potential evaluation Dashboard: Orchestrating complex B2B due‑diligence with glassmorphic design and real‑time agent state tracking.*
 
 ---
 
