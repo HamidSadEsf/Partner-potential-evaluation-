@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Intelligence Dashboard | Multi-Agent Demo</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030712;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --accent-primary: #38bdf8;
+            --accent-secondary: #818cf8;
+            --accent-success: #34d399;
+            --accent-warning: #fbbf24;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(129, 140, 248, 0.1) 0px, transparent 50%);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard {
+            width: 1000px;
+            height: 700px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar / Agent Status */
+        .sidebar {
+            background: rgba(0, 0, 0, 0.2);
+            border-right: 1px solid var(--glass-border);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .brand {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            background: linear-gradient(to right, #fff, var(--text-dim));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .agent-card {
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.5;
+        }
+
+        .agent-card.active {
+            opacity: 1;
+            background: rgba(56, 189, 248, 0.05);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+        }
+
+        .agent-card.complete {
+            opacity: 1;
+            background: rgba(52, 211, 153, 0.05);
+            border-color: rgba(52, 211, 153, 0.2);
+        }
+
+        .agent-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .agent-info h4 {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .agent-info p {
+            margin: 4px 0 0;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Main Content area */
+        .main {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            box-shadow: 0 0 0 rgba(56, 189, 248, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(56, 189, 248, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+            }
+        }
+
+        .feed {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .log-entry {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent-primary);
+            opacity: 0;
+            transform: translateX(-10px);
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .log-content {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .briefing-card {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1));
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 24px;
+            border-radius: 20px;
+            margin-top: auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .briefing-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .briefing-card h3 {
+            margin: 0 0 12px;
+            font-family: 'Outfit', sans-serif;
+            color: var(--accent-success);
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+        }
+
+        .metric-value {
+            display: block;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .metric-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* Colors for different agents */
+        .research {
+            border-left-color: var(--accent-primary);
+        }
+
+        .scoring {
+            border-left-color: var(--accent-warning);
+        }
+
+        .synthesis {
+            border-left-color: var(--accent-success);
+        }
+
+        .warn {
+            border-left-color: var(--accent-warning);
+            background: rgba(251, 191, 36, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="brand">Partner Potential Evaluation</div>
+
+            <div class="agent-card" id="agent-research">
+                <div class="agent-icon">🔍</div>
+                <div class="agent-info">
+                    <h4>Research Agent</h4>
+                    <p id="status-research">Waiting...</p>
+                </div>
+            </div>
+
+            <div class="agent-card" id="agent-scoring">
+                <div class="agent-icon">⚖️</div>
+                <div class="agent-info">
+                    <h4>Scoring Agent</h4>
+                    <p id="status-scoring">Waiting...</p>
+                </div>
+            </div>
+
+            <div class="agent-card" id="agent-synthesis">
+                <div class="agent-icon">📝</div>
+                <div class="agent-info">
+                    <h4>Synthesis Agent</h4>
+                    <p id="status-synthesis">Waiting...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="header">
+                <h2 style="font-family: 'Outfit'; font-weight: 600; margin: 0;">Partner Evaluation</h2>
+                <div class="status-badge">
+                    <div class="pulse" id="pulse"></div>
+                    <span id="global-status">System Live</span>
+                </div>
+            </div>
+
+            <div class="feed" id="feed">
+                <!-- Logs will be injected here -->
+            </div>
+
+            <div class="briefing-card" id="briefing">
+                <h3>Executive Briefing</h3>
+                <p id="briefing-text" style="font-size: 0.9rem; line-height: 1.6; color: var(--text-main); margin: 0;">
+                </p>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <span class="metric-value">85</span>
+                        <span class="metric-label">Risk Score</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-value">92%</span>
+                        <span class="metric-label">Confidence</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-value">0.12s</span>
+                        <span class="metric-label">Latency</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logs = [
+            { agent: 'research', title: 'SYSTEM INITIALIZATION', text: 'Launching multi‑agent due‑diligence pipeline...', delay: 800 },
+            { agent: 'research', title: 'DATA HARVESTING', text: 'Connected to regulatory data lake. Fetching Partner-001 (Acme Banking Ltd)...', delay: 1500 },
+            { agent: 'research', title: 'VALIDATION', text: 'Checked SEC filings and SOC-2 certifications. 100% data coverage detected.', delay: 1200 },
+            { agent: 'scoring', title: 'RISK ASSESSMENT', text: 'Applying deterministic rule-engine. Evaluating tech maturity and regulatory completeness...', delay: 1500 },
+            { agent: 'scoring', title: 'CALCULATION COMPLETE', text: 'Calculated Overall Risk: 85. Confidence score: 92% based on reasoning trace.', delay: 1000 },
+            { agent: 'synthesis', title: 'GENERATING BRIEFING', text: 'Synthesizing final executive report. Integrating risk metrics and recommendation narrative...', delay: 1500 }
+        ];
+
+        const briefingContent = "Proceed with onboarding Acme Banking Ltd. The partner shows exceptional regulatory compliance and a modern, documented tech stack. Low risk profile with high behavioral stability.";
+
+        const feed = document.getElementById('feed');
+        const briefing = document.getElementById('briefing');
+        const briefingText = document.getElementById('briefing-text');
+        const pulse = document.getElementById('pulse');
+        const globalStatus = document.getElementById('global-status');
+
+        async function updateAgent(id, status, isComplete = false) {
+            const card = document.getElementById(`agent-${id}`);
+            const statusText = document.getElementById(`status-${id}`);
+
+            // Deactivate others
+            document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+
+            card.classList.add('active');
+            statusText.textContent = status;
+
+            if (isComplete) {
+                card.classList.add('complete');
+                card.classList.remove('active');
+                statusText.textContent = 'Task Complete';
+            }
+        }
+
+        function addLog(log) {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${log.agent}`;
+            entry.innerHTML = `
+                <div class="log-header">
+                    <span>${log.agent.toUpperCase()} AGENT</span>
+                    <span>${log.title}</span>
+                </div>
+                <div class="log-content">${log.text}</div>
+            `;
+            feed.appendChild(entry);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        async function runDemo() {
+            for (let i = 0; i < logs.length; i++) {
+                const log = logs[i];
+                await updateAgent(log.agent, 'Processing...');
+                await new Promise(r => setTimeout(r, log.delay));
+                addLog(log);
+
+                // If it's the last log for an agent, mark it complete
+                if (i === 2) await updateAgent('research', '', true);
+                if (i === 4) await updateAgent('scoring', '', true);
+            }
+
+            await updateAgent('synthesis', '', true);
+
+            // Show final briefing
+            await new Promise(r => setTimeout(r, 800));
+            briefingText.textContent = briefingContent;
+            briefing.classList.add('visible');
+
+            pulse.style.background = 'var(--accent-success)';
+            globalStatus.textContent = 'Analysis Complete';
+        }
+
+        window.onload = runDemo;
+    </script>
+</body>
+
+</html>
